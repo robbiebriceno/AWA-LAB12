@@ -40,7 +40,9 @@ export async function GET(
     }
 
     const pagesValues = books
-      .map((b) => (typeof b.pages === "number" ? b.pages : null))
+      .map((b: { pages: number | null }) =>
+        typeof b.pages === "number" ? b.pages : null,
+      )
       .filter((v): v is number => v !== null);
 
     const averagePages = pagesValues.length
