@@ -46,14 +46,21 @@ export async function GET(
       .filter((v: number | null): v is number => v !== null);
 
     const averagePages = pagesValues.length
-      ? Math.round(pagesValues.reduce((a, b) => a + b, 0) / pagesValues.length)
+      ? Math.round(
+          pagesValues.reduce(
+            (a: number, b: number) => a + b,
+            0,
+          ) / pagesValues.length,
+        )
       : 0;
 
     const genres = Array.from(
       new Set(
         books
-          .map((b) => (b.genre ? b.genre.trim() : null))
-          .filter((g): g is string => !!g),
+          .map((b: { genre: string | null }) =>
+            b.genre ? b.genre.trim() : null,
+          )
+          .filter((g: string | null): g is string => !!g),
       ),
     );
 
@@ -66,7 +73,9 @@ export async function GET(
     ) as Array<{ title: string; pages: number }>;
 
     if (withPages.length > 0) {
-      const sortedByPages = [...withPages].sort((a, b) => a.pages - b.pages);
+      const sortedByPages = [...withPages].sort(
+        (a: { pages: number }, b: { pages: number }) => a.pages - b.pages,
+      );
       const shortest = sortedByPages[0];
       const longest = sortedByPages[sortedByPages.length - 1];
       shortestBook = { title: shortest.title, pages: shortest.pages };
