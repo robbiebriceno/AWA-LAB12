@@ -16,8 +16,8 @@ export async function GET() {
 
     const averagePages = Math.round(avgPagesAgg._avg.pages || 0);
     const genres = genresRaw
-      .map((r) => (r.genre ? r.genre.trim() : null))
-      .filter((g): g is string => !!g);
+      .map((r: { genre: string | null }) => (r.genre ? r.genre.trim() : null))
+      .filter((g: string | null): g is string => !!g);
 
     return NextResponse.json({
       totalAuthors,
