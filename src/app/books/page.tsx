@@ -56,8 +56,15 @@ export default function BooksPage() {
 
   async function loadAuthors() {
     const res = await fetch("/api/authors");
-    const data = await res.json();
-    setAuthors(data.map((a: any) => ({ id: a.id, name: a.name })));
+    let data: any = null;
+    try {
+      data = await res.json();
+    } catch (_e) {}
+    if (res.ok && Array.isArray(data)) {
+      setAuthors(data.map((a: any) => ({ id: a.id, name: a.name })));
+    } else {
+      setAuthors([]);
+    }
   }
 
   async function loadGenres() {
@@ -65,7 +72,7 @@ export default function BooksPage() {
     const res = await fetch("/api/stats");
     if (res.ok) {
       const stats = await res.json();
-      setGenres((stats.genres || []) as string[]);
+      setGenres(Array.isArray(stats.genres) ? (stats.genres as string[]) : []);
     }
   }
 
@@ -83,9 +90,23 @@ export default function BooksPage() {
       params.set("order", filters.order);
 
       const res = await fetch(`/api/books/search?${params.toString()}`);
-      const data = await res.json();
-      setBooks(data.data);
-      setTotal(data.pagination.total);
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch (_e) {}
+      if (
+        res.ok &&
+        json &&
+        Array.isArray(json.data) &&
+        json.pagination &&
+        typeof json.pagination.total === "number"
+      ) {
+        setBooks(json.data);
+        setTotal(json.pagination.total);
+      } else {
+        setBooks([]);
+        setTotal(0);
+      }
     } finally {
       setLoading(false);
     }

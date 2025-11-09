@@ -19,17 +19,32 @@ export default function AuthorDetailPage() {
         fetch(`/api/authors/${id}`),
         fetch(`/api/authors/${id}/stats`),
       ]);
-      const a = await aRes.json();
-      const s = await sRes.json();
-      setAuthor(a);
-      setStats(s);
-      setForm({
-        name: a.name || "",
-        email: a.email || "",
-        bio: a.bio || "",
-        nationality: a.nationality || "",
-        birthYear: a.birthYear ? String(a.birthYear) : "",
-      });
+      let a: any = null;
+      let s: any = null;
+      try { a = await aRes.json(); } catch (_e) {}
+      try { s = await sRes.json(); } catch (_e) {}
+      if (aRes.ok && a && a.id) {
+        setAuthor(a);
+        setForm({
+          name: a.name || "",
+          email: a.email || "",
+          bio: a.bio || "",
+          nationality: a.nationality || "",
+          birthYear: a.birthYear ? String(a.birthYear) : "",
+        });
+      } else {
+        setAuthor(null);
+      }
+      if (
+        sRes.ok &&
+        s &&
+        typeof s.totalBooks === "number" &&
+        Array.isArray(s.genres)
+      ) {
+        setStats(s);
+      } else {
+        setStats(null);
+      }
     } finally {
       setLoading(false);
     }

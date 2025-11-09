@@ -29,10 +29,19 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const res = await fetch("/api/authors");
-      const data = await res.json();
-      setAuthors(data);
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch (_e) {}
+      if (!res.ok || !Array.isArray(data)) {
+        setError("No se pudieron cargar autores");
+        setAuthors([]);
+      } else {
+        setAuthors(data);
+      }
     } catch (e) {
       console.error(e);
+      setError("Error de red al cargar autores");
     } finally {
       setLoading(false);
     }
@@ -41,8 +50,20 @@ export default function Dashboard() {
   async function loadStats() {
     try {
       const res = await fetch("/api/stats");
-      if (res.ok) {
-        setStats(await res.json());
+      if (!res.ok) return;
+      const s = await res.json();
+      if (
+        s &&
+        typeof s.totalAuthors === "number" &&
+        typeof s.totalBooks === "number" &&
+        typeof s.averagePages === "number"
+      ) {
+        setStats({
+          totalAuthors: s.totalAuthors,
+          totalBooks: s.totalBooks,
+          averagePages: s.averagePages,
+          genres: Array.isArray(s.genres) ? s.genres : [],
+        });
       }
     } catch (e) {
       console.error(e);
