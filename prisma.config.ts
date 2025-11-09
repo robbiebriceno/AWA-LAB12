@@ -1,5 +1,5 @@
-import "dotenv/config"; // Carga variables de .env
-import { defineConfig, env } from "prisma/config";
+import "dotenv/config"; // Carga variables de .env en local (Vercel usa env del proyecto)
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -8,7 +8,8 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    // Usa la variable de entorno DATABASE_URL; si falta, Prisma lanzará error antes de conectar.
-    url: env("DATABASE_URL"),
+    // No usar env() directo aquí para evitar fallo si falta en build; Prisma tomará la URL del schema.
+    // Esta clave es requerida por el tipo, pero podemos dejarla vacía y que la resolución ocurra vía schema.
+    url: process.env.DATABASE_URL || "postgresql://user:pass@localhost:5432/db?schema=public",
   },
 });
