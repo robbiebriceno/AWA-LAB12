@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../../../lib/prisma";
-import type { Book } from "@prisma/client";
 
 export async function GET(
   request: Request,
@@ -30,8 +29,8 @@ export async function GET(
     let latestBook: { title: string; year: number | null } | null = null;
 
     const withYearAsc = books.filter(
-      (b): b is Book & { publishedYear: number } => b.publishedYear !== null,
-    );
+      (b: { publishedYear: number | null }) => b.publishedYear !== null,
+    ) as Array<{ title: string; publishedYear: number }>;
 
     if (withYearAsc.length > 0) {
       const first = withYearAsc[0];
@@ -61,8 +60,8 @@ export async function GET(
     let shortestBook: { title: string; pages: number } | null = null;
 
     const withPages = books.filter(
-      (b): b is Book & { pages: number } => typeof b.pages === "number",
-    );
+      (b: { pages: number | null }) => typeof b.pages === "number",
+    ) as Array<{ title: string; pages: number }>;
 
     if (withPages.length > 0) {
       const sortedByPages = [...withPages].sort((a, b) => a.pages - b.pages);
