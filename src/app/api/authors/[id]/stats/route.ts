@@ -43,7 +43,7 @@ export async function GET(
       .map((b: { pages: number | null }) =>
         typeof b.pages === "number" ? b.pages : null,
       )
-      .filter((v): v is number => v !== null);
+      .filter((v: number | null): v is number => v !== null);
 
     const averagePages = pagesValues.length
       ? Math.round(pagesValues.reduce((a, b) => a + b, 0) / pagesValues.length)
